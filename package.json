@@ -1,0 +1,11 @@
+{
+    "name": "com.white-arrow.unity-3d-grid",
+    "version": "1.0.0",
+    "displayName": "Unity 3D Grid",
+    "description": "Flexible system for grid calculations in 3D City Unity.",
+    "licensesUrl": "https://github.com/CliffCalist/Unity-World-Grid/blob/feff57ba34b69f0444e04212faa0854cce0520cf/LICENSE",
+    "author": {
+        "name": "White Arrow",
+        "email": "cliffstersprog@gmail.com"
+    }
+}
