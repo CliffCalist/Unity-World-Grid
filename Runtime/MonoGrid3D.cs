@@ -6,7 +6,7 @@ namespace WhiteArrow
     {
         [SerializeField] private Grid3D _grid;
 
-        public Grid3D Grid => _grid;
+        public Grid3D Core => _grid;
 
 
         private void Awake()
