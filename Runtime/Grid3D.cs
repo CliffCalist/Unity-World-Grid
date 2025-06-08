@@ -7,7 +7,7 @@ namespace WhiteArrow
     public class Grid3D
     {
         #region Fields
-        [SerializeField] private Transform _originTranform;
+        [SerializeField] private Transform _originTransform;
         [SerializeField] private Vector3 _offset;
 
         [Space]
@@ -173,10 +173,10 @@ namespace WhiteArrow
         #region Prop: Common
         public Transform OriginTransform
         {
-            get => _originTranform;
+            get => _originTransform;
             set
             {
-                _originTranform = value;
+                _originTransform = value;
                 ChangedEvent?.Invoke();
             }
         }
@@ -222,7 +222,7 @@ namespace WhiteArrow
             if (template == null)
                 throw new ArgumentNullException(nameof(template));
 
-            _originTranform = template._originTranform;
+            _originTransform = template._originTransform;
 
             _scale = template._scale;
             _size = template._size;
@@ -268,8 +268,8 @@ namespace WhiteArrow
             var zPos = gridPosition.z * (ScaledCellSize.z + ScaledSpacing.z);
 
             var localPosition = new Vector3(xPos, yPos, zPos) - LocalCenter;
-            if (_originTranform != null)
-                localPosition = _originTranform.position + _originTranform.rotation * localPosition;
+            if (_originTransform != null)
+                localPosition = _originTransform.position + _originTransform.rotation * localPosition;
 
             return localPosition;
         }
@@ -312,7 +312,7 @@ namespace WhiteArrow
         public void OnDrawGizmos(Transform originTransform = null)
         {
             if (originTransform != null)
-                _originTranform = originTransform;
+                _originTransform = originTransform;
 
             Gizmos.color = Color.green;
 
@@ -325,8 +325,8 @@ namespace WhiteArrow
 
             if (_autoScale)
             {
-                var center = _originTranform != null ? _originTranform.position : Vector3.zero;
-                var maxWorldSizeWithRotation = _originTranform != null ? _originTranform.rotation * _maxWorldSize : _maxCellSize;
+                var center = _originTransform != null ? _originTransform.position : Vector3.zero;
+                var maxWorldSizeWithRotation = _originTransform != null ? _originTransform.rotation * _maxWorldSize : _maxCellSize;
 
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireCube(center, maxWorldSizeWithRotation);
