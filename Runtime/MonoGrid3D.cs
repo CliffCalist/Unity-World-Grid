@@ -11,21 +11,25 @@ namespace WhiteArrow
 
         private void Awake()
         {
-            _grid.OriginTransform = transform;
+            if (_grid.Origin.Transform != transform)
+                _grid.Origin.Transform = transform;
         }
 
-
-        [ContextMenu(nameof(ApplyAutoScale))]
-        public void ApplyAutoScale()
-        {
-            _grid.ApplyAutoScale();
-        }
 
 
 #if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (_grid.Origin.Transform == transform)
+            {
+                _grid.Origin.Transform = transform;
+                UnityEditor.EditorUtility.SetDirty(this);
+            }
+        }
+
         private void OnDrawGizmos()
         {
-            _grid.OnDrawGizmos(transform);
+            _grid.OnDrawGizmos();
         }
 #endif
     }
