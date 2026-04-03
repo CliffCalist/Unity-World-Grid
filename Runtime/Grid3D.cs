@@ -8,7 +8,7 @@ namespace WhiteArrow
     public class Grid3D
     {
         [FormerlySerializedAs("_size")]
-        [SerializeField] private Vector3Int _sizeCell;
+        [SerializeField] private Vector3Int _sizeInCells;
 
         [SerializeField] private Grid3DCells _cells = new();
 
@@ -19,14 +19,14 @@ namespace WhiteArrow
 
 
 
-        public Vector3Int SizeCell => _sizeCell;
-        public int Capacity => _sizeCell.x * _sizeCell.y * _sizeCell.z;
+        public Vector3Int SizeInCells => _sizeInCells;
+        public int Capacity => _sizeInCells.x * _sizeInCells.y * _sizeInCells.z;
 
-        public float WidthWorld => _cells.GetGridWidthWorld(_sizeCell.x, Origin.lossyScale.x);
-        public float DepthWorld => _cells.GetGridWidthWorld(_sizeCell.z, Origin.lossyScale.z);
-        public float HeightWorld => _cells.GetGridWidthWorld(_sizeCell.y, Origin.lossyScale.y);
-        public Vector3 SizeWorld => new(WidthWorld, HeightWorld, DepthWorld);
-        public Vector3 CenterWorld => new Vector3(WidthWorld, HeightWorld, DepthWorld) * 0.5f - _cells.CellSize / 2;
+        public float WidthInWorld => _cells.GetGridWidthInWorld(_sizeInCells.x, Origin.lossyScale.x);
+        public float DepthInWorld => _cells.GetGridWidthInWorld(_sizeInCells.z, Origin.lossyScale.z);
+        public float HeightInWorld => _cells.GetGridWidthInWorld(_sizeInCells.y, Origin.lossyScale.y);
+        public Vector3 SizeInWorld => new(WidthInWorld, HeightInWorld, DepthInWorld);
+        public Vector3 CenterInWorld => new Vector3(WidthInWorld, HeightInWorld, DepthInWorld) * 0.5f - _cells.CellSize / 2;
 
 
 
@@ -37,7 +37,7 @@ namespace WhiteArrow
             if (template == null)
                 throw new ArgumentNullException(nameof(template));
 
-            _sizeCell = template._sizeCell;
+            _sizeInCells = template._sizeInCells;
             Origin = template.Origin;
             _cells = new(template._cells);
         }
@@ -46,26 +46,26 @@ namespace WhiteArrow
 
         public Vector3Int GetCellPositionInGrid(int index)
         {
-            var yIndex = index / (_sizeCell.x * _sizeCell.z);
-            var xIndex = index / _sizeCell.z % _sizeCell.x;
-            var zIndex = index % _sizeCell.z;
+            var yIndex = index / (_sizeInCells.x * _sizeInCells.z);
+            var xIndex = index / _sizeInCells.z % _sizeInCells.x;
+            var zIndex = index % _sizeInCells.z;
 
             return new Vector3Int(xIndex, yIndex, zIndex);
         }
 
 
 
-        public Vector3 GetCellPositionWorld(Vector3Int gridPosition)
+        public Vector3 GetCellPositionInWorld(Vector3Int gridPosition)
         {
             var localPosition = _cells.GetCellPositionLocal(gridPosition, Origin.lossyScale);
             var worldPosition = Origin.position + Origin.rotation * localPosition;
             return worldPosition;
         }
 
-        public Vector3 GetCellPositionWorld(int index)
+        public Vector3 GetCellPositionInWorld(int index)
         {
             var gridPosition = GetCellPositionInGrid(index);
-            return GetCellPositionWorld(gridPosition);
+            return GetCellPositionInWorld(gridPosition);
         }
 
 
@@ -75,10 +75,10 @@ namespace WhiteArrow
         {
             Gizmos.color = Color.green;
 
-            var cellSize = _cells.GetCellSize(Origin.lossyScale);
+            var cellSize = _cells.GetScaledCellSize(Origin.lossyScale);
             for (int i = 0; i < Capacity; i++)
             {
-                var position = GetCellPositionWorld(i);
+                var position = GetCellPositionInWorld(i);
                 Gizmos.DrawWireCube(position, cellSize);
             }
         }
