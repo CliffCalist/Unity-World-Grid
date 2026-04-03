@@ -1,15 +1,10 @@
-using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace WhiteArrow
 {
-    [Serializable]
-    public class Grid3D
+    public class Grid3D : MonoBehaviour
     {
-        [FormerlySerializedAs("_size")]
         [SerializeField] private Vector3Int _sizeInCells;
-
         [SerializeField] private Grid3DCells _cells = new();
 
 
@@ -25,33 +20,9 @@ namespace WhiteArrow
 
 
 
-
-        /// <summary>
-        /// Creates an empty grid instance for serialization and manual setup.
-        /// </summary>
-        public Grid3D() { }
-
-        /// <summary>
-        /// Creates a copy of an existing grid instance.
-        /// </summary>
-        public Grid3D(Grid3D template)
+        private void Awake()
         {
-            if (template == null)
-                throw new ArgumentNullException(nameof(template));
-
-            _sizeInCells = template._sizeInCells;
-            _origin = template._origin;
-            _cells = new(template._cells);
-        }
-
-
-
-        /// <summary>
-        /// Initializes this grid with a non-null origin transform.
-        /// </summary>
-        public void Init(Transform origin)
-        {
-            _origin = origin ?? throw new ArgumentNullException(nameof(origin));
+            _origin = transform;
         }
 
 
@@ -62,7 +33,6 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetCellSizeInWorld()
         {
-            EnsureInitialized();
             return _cells.GetCellSizeInWorld(_origin);
         }
 
@@ -71,7 +41,6 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetCellSpacingInWorld()
         {
-            EnsureInitialized();
             return _cells.GetCellSpacingInWorld(_origin);
         }
         #endregion
@@ -84,7 +53,6 @@ namespace WhiteArrow
         /// </summary>
         public Vector3Int GetCellPositionInGrid(int index)
         {
-            EnsureInitialized();
             var yIndex = index / (_sizeInCells.x * _sizeInCells.z);
             var xIndex = index / _sizeInCells.z % _sizeInCells.x;
             var zIndex = index % _sizeInCells.z;
@@ -100,7 +68,6 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetCellPositionInOriginSpace(Vector3Int positionInGrid)
         {
-            EnsureInitialized();
             var cellSize = GetCellSizeInWorld();
             var cellSpacing = GetCellSpacingInWorld();
 
@@ -118,7 +85,6 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetCellPositionInWorld(int index)
         {
-            EnsureInitialized();
             var gridPosition = GetCellPositionInGrid(index);
             return GetCellPositionInWorld(gridPosition);
         }
@@ -128,7 +94,6 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetCellPositionInWorld(Vector3Int positionInGrid)
         {
-            EnsureInitialized();
             var localPosition = GetCellPositionInOriginSpace(positionInGrid);
             var worldPosition = _origin.TransformPoint(localPosition);
             return worldPosition;
@@ -143,7 +108,6 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetGridSizeInWorld()
         {
-            EnsureInitialized();
             var cellSize = GetCellSizeInWorld();
             var cellSpacing = GetCellSpacingInWorld();
 
@@ -176,7 +140,6 @@ namespace WhiteArrow
         /// </summary>
         public float GetGridWidthInWorld()
         {
-            EnsureInitialized();
             return GetGridAxisSizeInWorld(
                 _sizeInCells.x,
                 GetCellSizeInWorld().x,
@@ -190,7 +153,6 @@ namespace WhiteArrow
         /// </summary>
         public float GetGridDepthInWorld()
         {
-            EnsureInitialized();
             return GetGridAxisSizeInWorld(
                 _sizeInCells.z,
                 GetCellSizeInWorld().z,
@@ -204,7 +166,6 @@ namespace WhiteArrow
         /// </summary>
         public float GetGridHeightInWorld()
         {
-            EnsureInitialized();
             return GetGridAxisSizeInWorld(
                 _sizeInCells.y,
                 GetCellSizeInWorld().y,
@@ -232,7 +193,6 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetGridCenterInWorld()
         {
-            EnsureInitialized();
             return GetGridSizeInWorld() * 0.5f - GetCellSizeInWorld() / 2;
         }
         #endregion
@@ -240,9 +200,12 @@ namespace WhiteArrow
 
 
 #if UNITY_EDITOR
-        public void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
-            EnsureInitialized();
+            var thisTransform = transform;
+            if (_origin != thisTransform)
+                _origin = thisTransform;
+
             Gizmos.color = Color.green;
 
             var cellSize = GetCellSizeInWorld();
@@ -257,13 +220,5 @@ namespace WhiteArrow
             Gizmos.matrix = previousMatrix;
         }
 #endif
-
-
-
-        private void EnsureInitialized()
-        {
-            if (_origin == null)
-                throw new InvalidOperationException($"{nameof(Grid3D)} is not initialized. Call {nameof(Init)} before using it.");
-        }
     }
 }
