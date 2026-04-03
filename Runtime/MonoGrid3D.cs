@@ -14,8 +14,8 @@ namespace WhiteArrow
 
         private void Awake()
         {
-            if (_grid.Origin.Transform != transform)
-                _grid.Origin.Transform = transform;
+            if (_grid.Origin != transform)
+                _grid.Origin = transform;
         }
 
 
@@ -23,9 +23,9 @@ namespace WhiteArrow
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (_grid.Origin.Transform == transform)
+            if (_grid.Origin != transform)
             {
-                _grid.Origin.Transform = transform;
+                _grid.Origin = transform;
                 UnityEditor.EditorUtility.SetDirty(this);
             }
         }

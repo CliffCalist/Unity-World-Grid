@@ -7,19 +7,18 @@ namespace WhiteArrow
     public class Grid3D
     {
         [SerializeField] private Vector3Int _size;
-        [SerializeField] private Grid3DOrigin _origin = new();
         [SerializeField] private Grid3DCells _cells = new();
 
 
 
-        public Grid3DOrigin Origin => _origin;
+        public Transform Origin;
 
         public Vector3Int Size => _size;
         public int Capacity => _size.x * _size.y * _size.z;
 
-        public float WorldWidth => _cells.CalculateGridWidthInWorld(_size.x, _origin.Scale.x);
-        public float WorldDepth => _cells.CalculateGridWidthInWorld(_size.z, _origin.Scale.z);
-        public float WorldHeight => _cells.CalculateGridWidthInWorld(_size.y, _origin.Scale.y);
+        public float WorldWidth => _cells.CalculateGridWidthInWorld(_size.x, Origin.lossyScale.x);
+        public float WorldDepth => _cells.CalculateGridWidthInWorld(_size.z, Origin.lossyScale.z);
+        public float WorldHeight => _cells.CalculateGridWidthInWorld(_size.y, Origin.lossyScale.y);
         public Vector3 WorldSize => new(WorldWidth, WorldHeight, WorldDepth);
 
 
@@ -35,7 +34,7 @@ namespace WhiteArrow
                 throw new ArgumentNullException(nameof(template));
 
             _size = template._size;
-            _origin = new(template._origin);
+            Origin = template.Origin;
             _cells = new(template._cells);
         }
 
@@ -54,8 +53,8 @@ namespace WhiteArrow
 
         public Vector3 GetCellPositionInWorld(Vector3Int gridPosition)
         {
-            var localPosition = _cells.GetCellPositionInWorld(gridPosition, _origin.Scale);
-            var worldPosition = _origin.Position + _origin.Rotation * localPosition;
+            var localPosition = _cells.GetCellPositionInWorld(gridPosition, Origin.lossyScale);
+            var worldPosition = Origin.position + Origin.rotation * localPosition;
             return worldPosition;
         }
 
@@ -94,7 +93,7 @@ namespace WhiteArrow
         {
             Gizmos.color = Color.green;
 
-            var cellSize = _cells.GetCellSize(_origin.Scale);
+            var cellSize = _cells.GetCellSize(Origin.lossyScale);
             for (int i = 0; i < Capacity; i++)
             {
                 var position = GetCellPositionInWorld(i);
