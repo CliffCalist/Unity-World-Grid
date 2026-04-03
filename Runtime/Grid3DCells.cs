@@ -11,8 +11,14 @@ namespace WhiteArrow
 
 
 
+        /// <summary>
+        /// Creates an empty cells settings instance for serialization.
+        /// </summary>
         public Grid3DCells() { }
 
+        /// <summary>
+        /// Creates a copy of an existing cells settings instance.
+        /// </summary>
         public Grid3DCells(Grid3DCells template)
         {
             if (template == null)
@@ -24,6 +30,9 @@ namespace WhiteArrow
 
 
 
+        /// <summary>
+        /// Returns cell size scaled into world units using the provided origin transform.
+        /// </summary>
         public Vector3 GetCellSizeInWorld(Transform origin)
         {
             return new Vector3(
@@ -33,6 +42,9 @@ namespace WhiteArrow
             );
         }
 
+        /// <summary>
+        /// Returns cell spacing scaled into world units using the provided origin transform.
+        /// </summary>
         public Vector3 GetCellSpacingInWorld(Transform origin)
         {
             return new Vector3(

@@ -23,8 +23,14 @@ namespace WhiteArrow
 
 
 
+        /// <summary>
+        /// Creates an empty grid instance for serialization and manual setup.
+        /// </summary>
         public Grid3D() { }
 
+        /// <summary>
+        /// Creates a copy of an existing grid instance.
+        /// </summary>
         public Grid3D(Grid3D template)
         {
             if (template == null)
@@ -38,11 +44,17 @@ namespace WhiteArrow
 
 
         #region Cells Sizes
+        /// <summary>
+        /// Returns one cell size in world units using the current origin scale.
+        /// </summary>
         public Vector3 GetCellSizeInWorld()
         {
             return _cells.GetCellSizeInWorld(Origin);
         }
 
+        /// <summary>
+        /// Returns spacing between cells in world units using the current origin scale.
+        /// </summary>
         public Vector3 GetCellSpacingInWorld()
         {
             return _cells.GetCellSpacingInWorld(Origin);
@@ -52,6 +64,9 @@ namespace WhiteArrow
 
 
         #region Cells Positions
+        /// <summary>
+        /// Converts a linear index into 3D cell coordinates in the grid.
+        /// </summary>
         public Vector3Int GetCellPositionInGrid(int index)
         {
             var yIndex = index / (_sizeInCells.x * _sizeInCells.z);
@@ -63,6 +78,10 @@ namespace WhiteArrow
 
 
 
+        /// <summary>
+        /// Returns a cell offset in origin space in world units.
+        /// Does not apply origin translation or rotation.
+        /// </summary>
         public Vector3 GetCellPositionInOriginSpace(Vector3Int positionInGrid)
         {
             var cellSize = GetCellSizeInWorld();
@@ -77,12 +96,18 @@ namespace WhiteArrow
 
 
 
+        /// <summary>
+        /// Returns a cell world position by linear index.
+        /// </summary>
         public Vector3 GetCellPositionInWorld(int index)
         {
             var gridPosition = GetCellPositionInGrid(index);
             return GetCellPositionInWorld(gridPosition);
         }
 
+        /// <summary>
+        /// Returns a cell world position by applying the origin transform to the origin-space offset.
+        /// </summary>
         public Vector3 GetCellPositionInWorld(Vector3Int positionInGrid)
         {
             var localPosition = GetCellPositionInOriginSpace(positionInGrid);
@@ -94,6 +119,9 @@ namespace WhiteArrow
 
 
         #region Grid Sizes
+        /// <summary>
+        /// Returns total grid size in world units.
+        /// </summary>
         public Vector3 GetGridSizeInWorld()
         {
             var cellSize = GetCellSizeInWorld();
@@ -123,6 +151,9 @@ namespace WhiteArrow
             return new Vector3(sizeX, sizeY, sizeZ);
         }
 
+        /// <summary>
+        /// Returns total grid width in world units (X axis).
+        /// </summary>
         public float GetGridWidthInWorld()
         {
             return GetGridAxisSizeInWorld(
@@ -133,6 +164,9 @@ namespace WhiteArrow
             );
         }
 
+        /// <summary>
+        /// Returns total grid depth in world units (Z axis).
+        /// </summary>
         public float GetGridDepthInWorld()
         {
             return GetGridAxisSizeInWorld(
@@ -143,6 +177,9 @@ namespace WhiteArrow
             );
         }
 
+        /// <summary>
+        /// Returns total grid height in world units (Y axis).
+        /// </summary>
         public float GetGridHeightInWorld()
         {
             return GetGridAxisSizeInWorld(
@@ -153,6 +190,9 @@ namespace WhiteArrow
             );
         }
 
+        /// <summary>
+        /// Calculates world size for a single axis using cell count, cell size, spacing, and scale.
+        /// </summary>
         private float GetGridAxisSizeInWorld(int sizeInCells, float cellSize, float spacing, float scale)
         {
             var cells = sizeInCells * cellSize;
@@ -164,6 +204,9 @@ namespace WhiteArrow
 
 
         #region Grid Positions
+        /// <summary>
+        /// Returns the grid center offset in origin space, expressed in world units.
+        /// </summary>
         public Vector3 GetGridCenterInWorld()
         {
             return GetGridSizeInWorld() * 0.5f - GetCellSizeInWorld() / 2;
