@@ -7,8 +7,8 @@ namespace WhiteArrow
     public class Grid3D
     {
         [SerializeField] private Vector3Int _size;
-        [SerializeField] private Grid3DOrigin _origin;
-        [SerializeField] private Grid3DCells _cells;
+        [SerializeField] private Grid3DOrigin _origin = new();
+        [SerializeField] private Grid3DCells _cells = new();
 
 
 
