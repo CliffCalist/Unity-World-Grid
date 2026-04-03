@@ -10,11 +10,6 @@ namespace WhiteArrow
         [SerializeField] private Vector3 _spacing;
 
 
-        public Vector3 CellSize => _cellSize;
-        public Vector3 Spacing => _spacing;
-
-
-
 
         public Grid3DCells() { }
 
@@ -29,55 +24,21 @@ namespace WhiteArrow
 
 
 
-        public Vector3 GetCellPositionLocal(Vector3Int positionInGrid, Vector3 scale)
-        {
-            var scaledCellSize = GetScaledCellSize(scale);
-
-            var scaledSpacing = new Vector3(
-                _spacing.x * scale.x,
-                _spacing.y * scale.y,
-                _spacing.z * scale.z
-            );
-
-            var xPos = positionInGrid.x * (scaledCellSize.x + scaledSpacing.x);
-            var yPos = positionInGrid.y * (scaledCellSize.y + scaledSpacing.y);
-            var zPos = positionInGrid.z * (scaledCellSize.z + scaledSpacing.z);
-
-            return new Vector3(xPos, yPos, zPos);
-        }
-
-
-
-        public float GetGridWidthInWorld(int widthInCells, float scale = 1)
-        {
-            return GetGridAxisSizeInWorld(widthInCells, _cellSize.x, _spacing.x, scale);
-        }
-
-        public float GetGridDepthInWorld(int depthInCells, float scale = 1)
-        {
-            return GetGridAxisSizeInWorld(depthInCells, _cellSize.z, _spacing.z, scale);
-        }
-
-        public float GetGridHeightInWorld(int heightInCells, float scale = 1)
-        {
-            return GetGridAxisSizeInWorld(heightInCells, _cellSize.y, _spacing.y, scale);
-        }
-
-        private float GetGridAxisSizeInWorld(int sizeInCells, float cellSize, float spacing, float scale = 1)
-        {
-            var cells = sizeInCells * cellSize;
-            var spacingSize = (sizeInCells - 1) * spacing;
-            return (cells + spacingSize) * scale;
-        }
-
-
-
-        public Vector3 GetScaledCellSize(Vector3 scale)
+        public Vector3 GetCellSizeInWorld(Transform origin)
         {
             return new Vector3(
-                _cellSize.x * scale.x,
-                _cellSize.y * scale.y,
-                _cellSize.z * scale.z
+                _cellSize.x * origin.lossyScale.x,
+                _cellSize.y * origin.lossyScale.y,
+                _cellSize.z * origin.lossyScale.z
+            );
+        }
+
+        public Vector3 GetCellSpacingInWorld(Transform origin)
+        {
+            return new Vector3(
+                _spacing.x * origin.lossyScale.x,
+                _spacing.y * origin.lossyScale.y,
+                _spacing.z * origin.lossyScale.z
             );
         }
     }
