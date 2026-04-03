@@ -11,18 +11,19 @@ namespace WhiteArrow
 
 
 
+        [HideInInspector]
         public Transform Origin;
 
-        public Vector3Int Size => _size;
+
+
+        public Vector3Int SizeCell => _size;
         public int Capacity => _size.x * _size.y * _size.z;
 
-        public float WorldWidth => _cells.CalculateGridWidthInWorld(_size.x, Origin.lossyScale.x);
-        public float WorldDepth => _cells.CalculateGridWidthInWorld(_size.z, Origin.lossyScale.z);
-        public float WorldHeight => _cells.CalculateGridWidthInWorld(_size.y, Origin.lossyScale.y);
-        public Vector3 WorldSize => new(WorldWidth, WorldHeight, WorldDepth);
-
-
-        public Vector3 LocalCenter => new Vector3(WorldWidth, WorldHeight, WorldDepth) * 0.5f - _cells.CellSize / 2;
+        public float WidthWorld => _cells.GetGridWidthWorld(_size.x, Origin.lossyScale.x);
+        public float DepthWorld => _cells.GetGridWidthWorld(_size.z, Origin.lossyScale.z);
+        public float HeightWorld => _cells.GetGridWidthWorld(_size.y, Origin.lossyScale.y);
+        public Vector3 SizeWorld => new(WidthWorld, HeightWorld, DepthWorld);
+        public Vector3 CenterWorld => new Vector3(WidthWorld, HeightWorld, DepthWorld) * 0.5f - _cells.CellSize / 2;
 
 
 
@@ -51,17 +52,17 @@ namespace WhiteArrow
 
 
 
-        public Vector3 GetCellPositionInWorld(Vector3Int gridPosition)
+        public Vector3 GetCellPositionWorld(Vector3Int gridPosition)
         {
-            var localPosition = _cells.GetCellPositionInWorld(gridPosition, Origin.lossyScale);
+            var localPosition = _cells.GetCellPositionLocal(gridPosition, Origin.lossyScale);
             var worldPosition = Origin.position + Origin.rotation * localPosition;
             return worldPosition;
         }
 
-        public Vector3 GetCellPositionInWorld(int index)
+        public Vector3 GetCellPositionWorld(int index)
         {
             var gridPosition = GetCellPositionInGrid(index);
-            return GetCellPositionInWorld(gridPosition);
+            return GetCellPositionWorld(gridPosition);
         }
 
 
@@ -74,7 +75,7 @@ namespace WhiteArrow
             var cellSize = _cells.GetCellSize(Origin.lossyScale);
             for (int i = 0; i < Capacity; i++)
             {
-                var position = GetCellPositionInWorld(i);
+                var position = GetCellPositionWorld(i);
                 Gizmos.DrawWireCube(position, cellSize);
             }
         }

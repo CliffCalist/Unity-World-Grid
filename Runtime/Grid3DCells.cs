@@ -29,7 +29,7 @@ namespace WhiteArrow
 
 
 
-        public Vector3 GetCellPositionInWorld(Vector3Int positionInGrid, Vector3 scale)
+        public Vector3 GetCellPositionLocal(Vector3Int positionInGrid, Vector3 scale)
         {
             var scaledCellSize = GetCellSize(scale);
 
@@ -48,22 +48,22 @@ namespace WhiteArrow
 
 
 
-        public float CalculateGridWidthInWorld(int widthInCells, float scale = 1)
+        public float GetGridWidthWorld(int widthInCells, float scale = 1)
         {
-            return CalculateGridSizeInWorld(widthInCells, _cellSize.x, _spacing.x, scale);
+            return GetGridSizeWorldAxis(widthInCells, _cellSize.x, _spacing.x, scale);
         }
 
-        public float CalculateGridDepthInWorld(int depthInCells, float scale = 1)
+        public float GetGridDepthWorld(int depthInCells, float scale = 1)
         {
-            return CalculateGridSizeInWorld(depthInCells, _cellSize.z, _spacing.z, scale);
+            return GetGridSizeWorldAxis(depthInCells, _cellSize.z, _spacing.z, scale);
         }
 
-        public float CalculateGridHeightInWorld(int heightInCells, float scale = 1)
+        public float GetGridHeightWorld(int heightInCells, float scale = 1)
         {
-            return CalculateGridSizeInWorld(heightInCells, _cellSize.y, _spacing.y, scale);
+            return GetGridSizeWorldAxis(heightInCells, _cellSize.y, _spacing.y, scale);
         }
 
-        private float CalculateGridSizeInWorld(int sizeInCells, float cellSize, float spacing, float scale = 1)
+        private float GetGridSizeWorldAxis(int sizeInCells, float cellSize, float spacing, float scale = 1)
         {
             var cells = sizeInCells * cellSize;
             var spacingSize = (sizeInCells - 1) * spacing;
