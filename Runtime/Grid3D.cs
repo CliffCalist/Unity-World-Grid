@@ -12,14 +12,17 @@ namespace WhiteArrow
 
         [SerializeField] private Grid3DCells _cells = new();
 
-        [HideInInspector] public Transform Origin;
+
+
+        private Transform _origin;
 
 
 
+        public Transform Origin => _origin;
         public Vector3Int SizeInCells => _sizeInCells;
         public int Capacity => _sizeInCells.x * _sizeInCells.y * _sizeInCells.z;
-
         public Grid3DCells Cells => _cells;
+
 
 
 
@@ -37,8 +40,18 @@ namespace WhiteArrow
                 throw new ArgumentNullException(nameof(template));
 
             _sizeInCells = template._sizeInCells;
-            Origin = template.Origin;
+            _origin = template._origin;
             _cells = new(template._cells);
+        }
+
+
+
+        /// <summary>
+        /// Initializes this grid with a non-null origin transform.
+        /// </summary>
+        public void Init(Transform origin)
+        {
+            _origin = origin ?? throw new ArgumentNullException(nameof(origin));
         }
 
 
@@ -49,7 +62,8 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetCellSizeInWorld()
         {
-            return _cells.GetCellSizeInWorld(Origin);
+            EnsureInitialized();
+            return _cells.GetCellSizeInWorld(_origin);
         }
 
         /// <summary>
@@ -57,7 +71,8 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetCellSpacingInWorld()
         {
-            return _cells.GetCellSpacingInWorld(Origin);
+            EnsureInitialized();
+            return _cells.GetCellSpacingInWorld(_origin);
         }
         #endregion
 
@@ -69,6 +84,7 @@ namespace WhiteArrow
         /// </summary>
         public Vector3Int GetCellPositionInGrid(int index)
         {
+            EnsureInitialized();
             var yIndex = index / (_sizeInCells.x * _sizeInCells.z);
             var xIndex = index / _sizeInCells.z % _sizeInCells.x;
             var zIndex = index % _sizeInCells.z;
@@ -84,6 +100,7 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetCellPositionInOriginSpace(Vector3Int positionInGrid)
         {
+            EnsureInitialized();
             var cellSize = GetCellSizeInWorld();
             var cellSpacing = GetCellSpacingInWorld();
 
@@ -101,6 +118,7 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetCellPositionInWorld(int index)
         {
+            EnsureInitialized();
             var gridPosition = GetCellPositionInGrid(index);
             return GetCellPositionInWorld(gridPosition);
         }
@@ -110,8 +128,9 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetCellPositionInWorld(Vector3Int positionInGrid)
         {
+            EnsureInitialized();
             var localPosition = GetCellPositionInOriginSpace(positionInGrid);
-            var worldPosition = Origin.TransformPoint(localPosition);
+            var worldPosition = _origin.TransformPoint(localPosition);
             return worldPosition;
         }
         #endregion
@@ -124,6 +143,7 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetGridSizeInWorld()
         {
+            EnsureInitialized();
             var cellSize = GetCellSizeInWorld();
             var cellSpacing = GetCellSpacingInWorld();
 
@@ -131,21 +151,21 @@ namespace WhiteArrow
                 _sizeInCells.x,
                 cellSize.x,
                 cellSpacing.x,
-                Origin.lossyScale.x
+                _origin.lossyScale.x
             );
 
             var sizeY = GetGridAxisSizeInWorld(
                 _sizeInCells.y,
                 cellSize.y,
                 cellSpacing.y,
-                Origin.lossyScale.y
+                _origin.lossyScale.y
             );
 
             var sizeZ = GetGridAxisSizeInWorld(
                 _sizeInCells.z,
                 cellSize.z,
                 cellSpacing.z,
-                Origin.lossyScale.z
+                _origin.lossyScale.z
             );
 
             return new Vector3(sizeX, sizeY, sizeZ);
@@ -156,11 +176,12 @@ namespace WhiteArrow
         /// </summary>
         public float GetGridWidthInWorld()
         {
+            EnsureInitialized();
             return GetGridAxisSizeInWorld(
                 _sizeInCells.x,
                 GetCellSizeInWorld().x,
                 GetCellSpacingInWorld().x,
-                Origin.lossyScale.x
+                _origin.lossyScale.x
             );
         }
 
@@ -169,11 +190,12 @@ namespace WhiteArrow
         /// </summary>
         public float GetGridDepthInWorld()
         {
+            EnsureInitialized();
             return GetGridAxisSizeInWorld(
                 _sizeInCells.z,
                 GetCellSizeInWorld().z,
                 GetCellSpacingInWorld().z,
-                Origin.lossyScale.z
+                _origin.lossyScale.z
             );
         }
 
@@ -182,11 +204,12 @@ namespace WhiteArrow
         /// </summary>
         public float GetGridHeightInWorld()
         {
+            EnsureInitialized();
             return GetGridAxisSizeInWorld(
                 _sizeInCells.y,
                 GetCellSizeInWorld().y,
                 GetCellSpacingInWorld().y,
-                Origin.lossyScale.y
+                _origin.lossyScale.y
             );
         }
 
@@ -209,6 +232,7 @@ namespace WhiteArrow
         /// </summary>
         public Vector3 GetGridCenterInWorld()
         {
+            EnsureInitialized();
             return GetGridSizeInWorld() * 0.5f - GetCellSizeInWorld() / 2;
         }
         #endregion
@@ -218,6 +242,7 @@ namespace WhiteArrow
 #if UNITY_EDITOR
         public void OnDrawGizmos()
         {
+            EnsureInitialized();
             Gizmos.color = Color.green;
 
             var cellSize = GetCellSizeInWorld();
@@ -225,12 +250,20 @@ namespace WhiteArrow
             for (int i = 0; i < Capacity; i++)
             {
                 var position = GetCellPositionInWorld(i);
-                Gizmos.matrix = Matrix4x4.TRS(position, Origin.rotation, Vector3.one);
+                Gizmos.matrix = Matrix4x4.TRS(position, _origin.rotation, Vector3.one);
                 Gizmos.DrawWireCube(Vector3.zero, cellSize);
             }
 
             Gizmos.matrix = previousMatrix;
         }
 #endif
+
+
+
+        private void EnsureInitialized()
+        {
+            if (_origin == null)
+                throw new InvalidOperationException($"{nameof(Grid3D)} is not initialized. Call {nameof(Init)} before using it.");
+        }
     }
 }

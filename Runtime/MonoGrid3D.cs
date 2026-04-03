@@ -8,32 +8,35 @@ namespace WhiteArrow
 
 
 
-        public Grid3D Core => _grid;
+        public Grid3D Grid => _grid;
 
 
 
         private void Awake()
         {
-            if (_grid.Origin != transform)
-                _grid.Origin = transform;
+            EnsureGridInitialized();
         }
 
 
 
 #if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (_grid.Origin != transform)
-            {
-                _grid.Origin = transform;
-                UnityEditor.EditorUtility.SetDirty(this);
-            }
-        }
-
         private void OnDrawGizmos()
         {
+            EnsureGridInitialized();
             _grid.OnDrawGizmos();
         }
 #endif
+
+        private bool EnsureGridInitialized()
+        {
+            var wasNull = _grid == null;
+            _grid ??= new Grid3D();
+
+            var originChanged = _grid.Origin != transform;
+            if (originChanged)
+                _grid.Init(transform);
+
+            return wasNull || originChanged;
+        }
     }
 }
