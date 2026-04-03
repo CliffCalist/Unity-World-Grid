@@ -66,28 +66,6 @@ namespace WhiteArrow
 
 
 
-        public float Min(params float[] valuesParams)
-        {
-            var min = float.MaxValue;
-            foreach (var value in valuesParams)
-            {
-                if (value < min)
-                    min = value;
-            }
-
-            return min;
-        }
-
-        public Vector3 ClampVectorAxes(Vector3 vector, float maxValue)
-        {
-            return new Vector3(
-                Mathf.Min(vector.x, maxValue),
-                Mathf.Min(vector.y, maxValue),
-                Mathf.Min(vector.z, maxValue));
-        }
-
-
-
 #if UNITY_EDITOR
         public void OnDrawGizmos()
         {
