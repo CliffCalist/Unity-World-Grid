@@ -63,7 +63,7 @@ namespace WhiteArrow
 
 
 
-        public Vector3 GetCellPositionLocalWorld(Vector3Int positionInGrid)
+        public Vector3 GetCellPositionInOriginSpace(Vector3Int positionInGrid)
         {
             var cellSize = GetCellSizeInWorld();
             var cellSpacing = GetCellSpacingInWorld();
@@ -85,8 +85,8 @@ namespace WhiteArrow
 
         public Vector3 GetCellPositionInWorld(Vector3Int positionInGrid)
         {
-            var localPosition = GetCellPositionLocalWorld(positionInGrid);
-            var worldPosition = Origin.position + Origin.rotation * localPosition;
+            var localPosition = GetCellPositionInOriginSpace(positionInGrid);
+            var worldPosition = Origin.TransformPoint(localPosition);
             return worldPosition;
         }
         #endregion
