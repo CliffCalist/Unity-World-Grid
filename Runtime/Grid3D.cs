@@ -64,6 +64,7 @@ namespace WhiteArrow
 
         /// <summary>
         /// Returns a cell offset in origin space in world units.
+        /// This offset is measured from the grid coordinates origin (cell 0,0,0).
         /// Does not apply origin translation or rotation.
         /// </summary>
         public Vector3 GetCellPositionInOriginSpace(Vector3Int positionInGrid)
@@ -76,6 +77,25 @@ namespace WhiteArrow
             var zPos = positionInGrid.z * (cellSize.z + cellSpacing.z);
 
             return new Vector3(xPos, yPos, zPos);
+        }
+
+        /// <summary>
+        /// Returns world position of the grid coordinates origin (cell 0,0,0).
+        /// This is the anchor point that replaces direct use of <see cref="_origin"/> position for grid coordinates.
+        /// </summary>
+        public Vector3 GetGridCoordinatesOriginInWorld()
+        {
+            var cellSize = GetCellSizeInWorld();
+            var gridWidth = GetGridWidthInWorld();
+            var gridDepth = GetGridDepthInWorld();
+
+            var originOffset = new Vector3(
+                -0.5f * (gridWidth - cellSize.x),
+                0f,
+                -0.5f * (gridDepth - cellSize.z)
+            );
+
+            return _origin.TransformPoint(originOffset);
         }
 
 
@@ -95,7 +115,8 @@ namespace WhiteArrow
         public Vector3 GetCellPositionInWorld(Vector3Int positionInGrid)
         {
             var localPosition = GetCellPositionInOriginSpace(positionInGrid);
-            var worldPosition = _origin.TransformPoint(localPosition);
+            var coordinatesOrigin = GetGridCoordinatesOriginInWorld();
+            var worldPosition = coordinatesOrigin + _origin.rotation * localPosition;
             return worldPosition;
         }
         #endregion
