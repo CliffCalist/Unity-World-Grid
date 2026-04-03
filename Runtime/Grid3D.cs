@@ -1,12 +1,15 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace WhiteArrow
 {
     [Serializable]
     public class Grid3D
     {
-        [SerializeField] private Vector3Int _size;
+        [FormerlySerializedAs("_size")]
+        [SerializeField] private Vector3Int _sizeCell;
+
         [SerializeField] private Grid3DCells _cells = new();
 
 
@@ -16,12 +19,12 @@ namespace WhiteArrow
 
 
 
-        public Vector3Int SizeCell => _size;
-        public int Capacity => _size.x * _size.y * _size.z;
+        public Vector3Int SizeCell => _sizeCell;
+        public int Capacity => _sizeCell.x * _sizeCell.y * _sizeCell.z;
 
-        public float WidthWorld => _cells.GetGridWidthWorld(_size.x, Origin.lossyScale.x);
-        public float DepthWorld => _cells.GetGridWidthWorld(_size.z, Origin.lossyScale.z);
-        public float HeightWorld => _cells.GetGridWidthWorld(_size.y, Origin.lossyScale.y);
+        public float WidthWorld => _cells.GetGridWidthWorld(_sizeCell.x, Origin.lossyScale.x);
+        public float DepthWorld => _cells.GetGridWidthWorld(_sizeCell.z, Origin.lossyScale.z);
+        public float HeightWorld => _cells.GetGridWidthWorld(_sizeCell.y, Origin.lossyScale.y);
         public Vector3 SizeWorld => new(WidthWorld, HeightWorld, DepthWorld);
         public Vector3 CenterWorld => new Vector3(WidthWorld, HeightWorld, DepthWorld) * 0.5f - _cells.CellSize / 2;
 
@@ -34,7 +37,7 @@ namespace WhiteArrow
             if (template == null)
                 throw new ArgumentNullException(nameof(template));
 
-            _size = template._size;
+            _sizeCell = template._sizeCell;
             Origin = template.Origin;
             _cells = new(template._cells);
         }
@@ -43,9 +46,9 @@ namespace WhiteArrow
 
         public Vector3Int GetCellPositionInGrid(int index)
         {
-            var yIndex = index / (_size.x * _size.z);
-            var xIndex = index / _size.z % _size.x;
-            var zIndex = index % _size.z;
+            var yIndex = index / (_sizeCell.x * _sizeCell.z);
+            var xIndex = index / _sizeCell.z % _sizeCell.x;
+            var zIndex = index % _sizeCell.z;
 
             return new Vector3Int(xIndex, yIndex, zIndex);
         }
