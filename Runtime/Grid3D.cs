@@ -221,11 +221,15 @@ namespace WhiteArrow
             Gizmos.color = Color.green;
 
             var cellSize = GetCellSizeInWorld();
+            var previousMatrix = Gizmos.matrix;
             for (int i = 0; i < Capacity; i++)
             {
                 var position = GetCellPositionInWorld(i);
-                Gizmos.DrawWireCube(position, cellSize);
+                Gizmos.matrix = Matrix4x4.TRS(position, Origin.rotation, Vector3.one);
+                Gizmos.DrawWireCube(Vector3.zero, cellSize);
             }
+
+            Gizmos.matrix = previousMatrix;
         }
 #endif
     }
